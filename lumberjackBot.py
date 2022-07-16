@@ -47,9 +47,7 @@ class ScreenPixel(object):
  
         # Get width/height of image
         self.width = CG.CGImageGetWidth(image)
-        print(self.width)
         self.height = CG.CGImageGetHeight(image)
-        print(self.height)
  
     def pixel(self, x, y):
         """Get pixel value at given (x,y) screen coordinates
@@ -80,7 +78,7 @@ class lumberjackBot():
         # Those attributes has been placed here in order to save calcs:
         self.x = x    # Left side branch X location
         self.y = y   # Left side branch Y location
-        if self.x/2 > self.treeX:
+        if self.x/2 > self.treeX/2:
             self.right = True
         else:
             self.right = False
@@ -99,7 +97,7 @@ class lumberjackBot():
             print('right')
             pyautogui.typewrite(['right', 'right'], speed)
         self.movement_buffer = self.movement_buffer[1:]
-        time.sleep(0.05)
+        time.sleep(0.06)
 
     def get_pixel(self, x, y):    # Modify class atribute
         # screen = windll.user32.GetDC(0)
@@ -112,10 +110,8 @@ class lumberjackBot():
     def play(self):
         while True:
             self.pixel.capture(region=self.region)
-            print(self.region)
             pixel_color = self.pixel.pixel(0, 0)
             #pixel_color = self.get_pixel(self.x, self.y)
-            print(pixel_color)
             if self.right:
                 if pixel_color[2] < 200:
                     # print("right")
@@ -149,14 +145,12 @@ if __name__ == "__main__":
     time.sleep(3)
     playX, playY = pyautogui.locateCenterOnScreen('play.png', confidence=0.9)
     playX, playY = round(playX/2), round(playY/2)
-    print(f"Coordenadas: {playX}, {playY}")
     pyautogui.moveTo(playX, playY)
     pyautogui.click()   # Start the game by pressing play button
     time.sleep(0.5)     # Wait for screen refresh
     branches = pyautogui.locateAllOnScreen('branch.png', confidence=0.9)
     x, y = bottom_most_branch(branches)
     #x, y = x/2, y/2
-    print(f"Coordenadas: {x}, {y}")
     pyautogui.moveTo(x/2, y/2 + 5)
     treeX, treeY = playX - 6, playY - 177  # Tree position
     #treeX, treeY = treeX/2, treeY/2
