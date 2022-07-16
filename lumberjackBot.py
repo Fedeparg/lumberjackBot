@@ -80,14 +80,14 @@ class lumberjackBot():
         # Those attributes has been placed here in order to save calcs:
         self.x = x    # Left side branch X location
         self.y = y   # Left side branch Y location
-        if self.x/2 > self.playX:
+        if self.x/2 > self.treeX:
             self.right = True
         else:
             self.right = False
         self.movement_buffer = ['right']
 
         self.pixel = ScreenPixel()
-        self.region = CG.CGRectMake(x/2, y/2, 10, 10)
+        self.region = CG.CGRectMake(x/2, y/2, 2, 2)
 
     def move(self, direction):
         self.movement_buffer.append(direction)
@@ -99,7 +99,7 @@ class lumberjackBot():
             print('right')
             pyautogui.typewrite(['right', 'right'], speed)
         self.movement_buffer = self.movement_buffer[1:]
-        time.sleep(0.08)
+        time.sleep(0.05)
 
     def get_pixel(self, x, y):    # Modify class atribute
         # screen = windll.user32.GetDC(0)
@@ -113,7 +113,7 @@ class lumberjackBot():
         while True:
             self.pixel.capture(region=self.region)
             print(self.region)
-            pixel_color = self.pixel.pixel(5, 5)
+            pixel_color = self.pixel.pixel(0, 0)
             #pixel_color = self.get_pixel(self.x, self.y)
             print(pixel_color)
             if self.right:
@@ -147,7 +147,7 @@ def bottom_most_branch(branches: Iterator):
 if __name__ == "__main__":
     print("Running in 3 seconds, minimize this windows. To stop the program drag the mouse to the top-left corner of your screen.")
     time.sleep(3)
-    playX, playY = pyautogui.locateCenterOnScreen('play.png', confidence=0.8)
+    playX, playY = pyautogui.locateCenterOnScreen('play.png', confidence=0.9)
     playX, playY = round(playX/2), round(playY/2)
     print(f"Coordenadas: {playX}, {playY}")
     pyautogui.moveTo(playX, playY)
@@ -161,6 +161,8 @@ if __name__ == "__main__":
     treeX, treeY = playX - 6, playY - 177  # Tree position
     #treeX, treeY = treeX/2, treeY/2
     #time.sleep(0.3)
+    treeX, treeY = pyautogui.locateCenterOnScreen('tree.png', confidence=0.9)
+    print(f"Arbol: {treeX/2}, {treeY/2}")
     print("Im playing...")
     lumberjack = lumberjackBot(playX, playY, treeX, treeY, x, y)
     lumberjack.play()   # Game start
