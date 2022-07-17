@@ -80,9 +80,9 @@ class lumberjackBot():
         self.branchY = branchY
         # Know if branch is right or left of the tree
         if self.branchX/2 > self.treeX/2:
-            self.right = True
+            self.right_branch = True
         else:
-            self.right = False
+            self.right_branch = False
         self.movement_buffer = ['right']
 
         self.pixel = ScreenPixel()
@@ -91,7 +91,7 @@ class lumberjackBot():
 
     def move(self, direction):
         self.movement_buffer.append(direction)
-        speed = 0.033  # 2 frames aprox.
+        speed = 0.0305  # 2 frames aprox.
 
         # Always double movement because there is a gap between branches
         if self.movement_buffer[0] == 'left':
@@ -106,7 +106,9 @@ class lumberjackBot():
         while True:
             self.pixel.capture(region=self.region)
             pixel_color = self.pixel.pixel(0, 0)
-            if self.right:
+
+            # Only check for blue > 200 to check for branch vs sky
+            if self.right_branch:
                 if pixel_color[2] < 200:
                     self.move('left')
                 else:
@@ -143,7 +145,7 @@ if __name__ == '__main__':
     time.sleep(0.5)     # Wait for screen refresh
     branches = pyautogui.locateAllOnScreen('imgs/branch.png', confidence=0.9)
     branchX, branchY = lowest_branch(branches)
-    pyautogui.moveTo(branchX/2, branchY/2 + 5)
+    pyautogui.moveTo(branchX/2, branchY/2)
     treeX, treeY = pyautogui.locateCenterOnScreen(
         'imgs/tree.png', confidence=0.9)
     print(f'Im playing...')
