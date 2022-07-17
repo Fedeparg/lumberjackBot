@@ -2,6 +2,8 @@
 
 Bot made for LumberJack telegram game. It recognises a couple of key pixels on your screen and makes lumberjack dodge tree's branches.
 
+*This is a mod to work exclusively on MacOS from the original code from [Enrique Moran](https://github.com/EnriqueMoran/lumberjackBot).*
+
 ## How does it works? 🤷
 
 The script searches for the play button anywhere on the screen. Once it is pressed, it tries to locate the most lower branch and take it into account to play the game.
