@@ -22,14 +22,14 @@ class ScreenPixel(object):
 
         if region is None:
             region = CG.CGRectInfinite
-        else:
+        # else:
             # TODO: Odd widths cause the image to warp. This is likely
             # caused by offset calculation in ScreenPixel.pixel, and
             # could could modified to allow odd-widths
-            if region.size.width % 2 > 0:
-                emsg = "Capture region width should be even (was %s)" % (
-                    region.size.width)
-                raise ValueError(emsg)
+            # if region.size.width % 2 > 0:
+            #     emsg = "Capture region width should be even (was %s)" % (
+            #         region.size.width)
+            #     raise ValueError(emsg)
 
         # Create screenshot as CGImage
         image = CG.CGWindowListCreateImage(
@@ -56,7 +56,7 @@ class ScreenPixel(object):
 
         # Pixel data is unsigned char (8bit unsigned integer),
         # and there are for (blue,green,red,alpha)
-        data_format = "BBBB"
+        data_format = 'BBBB'
 
         # Calculate offset, based on
         # http://www.markj.net/iphone-uiimage-pixel-color/
@@ -71,34 +71,36 @@ class ScreenPixel(object):
 
 class lumberjackBot():
 
-    def __init__(self, playX, playY, treeX, treeY, x, y):
+    def __init__(self, playX, playY, treeX, treeY, branchX, branchY):
         self.playX = playX
         self.playY = playY
         self.treeX = treeX
         self.treeY = treeY
-        # Those attributes has been placed here in order to save calcs:
-        self.x = x    # Left side branch X location
-        self.y = y   # Left side branch Y location
-        if self.x/2 > self.treeX/2:
+        self.branchX = branchX
+        self.branchY = branchY
+        # Know if branch is right or left of the tree
+        if self.branchX/2 > self.treeX/2:
             self.right = True
         else:
             self.right = False
         self.movement_buffer = ['right']
 
         self.pixel = ScreenPixel()
-        self.region = CG.CGRectMake(x/2, y/2, 2, 2)
+        # We just need to check for 1 pixel where the branch is
+        self.region = CG.CGRectMake(branchX/2, branchY/2, 1, 1)
 
     def move(self, direction):
         self.movement_buffer.append(direction)
-        speed = 0.032 # 2 frames
-        if self.movement_buffer[0] == "left":
+        speed = 0.033  # 2 frames aprox.
+
+        # Always double movement because there is a gap between branches
+        if self.movement_buffer[0] == 'left':
             print('left')
             pyautogui.typewrite(['left', 'left'], speed)
-        elif self.movement_buffer[0] == "right":
+        elif self.movement_buffer[0] == 'right':
             print('right')
             pyautogui.typewrite(['right', 'right'], speed)
         self.movement_buffer = self.movement_buffer[1:]
-        #time.sleep(0.06)
 
     def play(self):
         while True:
@@ -106,19 +108,19 @@ class lumberjackBot():
             pixel_color = self.pixel.pixel(0, 0)
             if self.right:
                 if pixel_color[2] < 200:
-                    self.move("left")
+                    self.move('left')
                 else:
-                    self.move("right")
+                    self.move('right')
             else:
                 if pixel_color[2] < 200:
-                    self.move("right")
+                    self.move('right')
                 else:
-                    self.move("left")
+                    self.move('left')
 
 
-def bottom_most_branch(branches):
+def lowest_branch(branches):
     bottom_most = None
-    # Search for the branch most lower
+    # Search for the lowest branch
     for branch in branches:
         if bottom_most is None:
             bottom_most = branch
@@ -127,23 +129,23 @@ def bottom_most_branch(branches):
     return bottom_most[:2]
 
 
-if __name__ == "__main__":
-    print("Running in 3 seconds, minimize this windows. To stop the program drag the mouse to the top-left corner of your screen.")
+if __name__ == '__main__':
+    print(f'Running in 3 seconds. To stop the program drag the mouse to the top-left corner of your screen.')
     time.sleep(3)
-    playX, playY = pyautogui.locateCenterOnScreen('imgs/play.png', confidence=0.9)
+    playX, playY = pyautogui.locateCenterOnScreen(
+        'imgs/play.png', confidence=0.9)
+    # Any resolution divided by 2 is to take into account retina display and defualt
+    # screen scale that Apple uses
     playX, playY = round(playX/2), round(playY/2)
     pyautogui.moveTo(playX, playY)
-    pyautogui.click()   # Start the game by pressing play button
+    # Start the game by pressing play button. Does not work with replay.
+    pyautogui.click()
     time.sleep(0.5)     # Wait for screen refresh
     branches = pyautogui.locateAllOnScreen('imgs/branch.png', confidence=0.9)
-    x, y = bottom_most_branch(branches)
-    #x, y = x/2, y/2
-    pyautogui.moveTo(x/2, y/2 + 5)
-    treeX, treeY = playX - 6, playY - 177  # Tree position
-    #treeX, treeY = treeX/2, treeY/2
-    # time.sleep(0.3)
-    treeX, treeY = pyautogui.locateCenterOnScreen('imgs/tree.png', confidence=0.9)
-    print(f"Arbol: {treeX/2}, {treeY/2}")
-    print("Im playing...")
-    lumberjack = lumberjackBot(playX, playY, treeX, treeY, x, y)
+    branchX, branchY = lowest_branch(branches)
+    pyautogui.moveTo(branchX/2, branchY/2 + 5)
+    treeX, treeY = pyautogui.locateCenterOnScreen(
+        'imgs/tree.png', confidence=0.9)
+    print(f'Im playing...')
+    lumberjack = lumberjackBot(playX, playY, treeX, treeY, branchX, branchY)
     lumberjack.play()   # Game start
