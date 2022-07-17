@@ -13,6 +13,7 @@ After that, it uses PyAutoGUI to simulate user inputs and play the game.
 ## Usage example 👀
 
 Here you can check for a video showcase of the bot playing the game (image clickable):
+
 [![Showcase video](https://img.youtube.com/vi/09UVK9AhwZQ/0.jpg)](https://www.youtube.com/watch?v=09UVK9AhwZQ )
 
 First install the requierements through `pip install -r requirements.txt`.
